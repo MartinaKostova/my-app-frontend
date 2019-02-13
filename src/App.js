@@ -1,45 +1,83 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import React, { Component } from "react";
+import callApi from "./util/api";
+import {
+  Image,
+  List,
+  Button,
+  Card,
+  Header,
+  Icon,
+  Menu,
+  Segment,
+  Sidebar
+} from "semantic-ui-react";
 
 class App extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       items: [],
-      isLoaded: false,
-    }
+      isLoaded: false
+    };
   }
 
   componentDidMount() {
-    fetch("http://localhost:8080/cars ")
-      .then(res => res.json())
-      .then(
-        (json) => {
-          this.setState({
-            isLoaded: true,
-            items: json,
-          });
-        },
-      )
+    callApi("cars").then(result => {
+      if (result instanceof Error) {
+        this.setState({
+          isLoaded: true,
+          error: result
+        });
+      } else {
+        this.setState({
+          isLoaded: true,
+          items: result
+        });
+      }
+    });
   }
 
   render() {
+    const { error, isLoaded, items } = this.state;
+    if (error) {
+      return <div>Error: {error.message}</div>;
+    } else if (!isLoaded) {
+      return <div>Loading...</div>;
+    } else {
+      var data = items.map(item => (
+        <List.Item>
+          <List.Content>
+            <Card>
+              <Card.Content>
+                <Card.Header>{item.id}</Card.Header>
+                <Card.Meta>{item.id}</Card.Meta>
+                <Card.Description>{item.brand}
+                  <strong>{item.colour}</strong>
+                </Card.Description>
+              </Card.Content>
+              <Card.Content extra>
+                <div className="ui two buttons">
+                  <Button basic color="green">
+                    Approve
+                  </Button>
+                  <Button basic color="red">
+                    Decline
+                  </Button>
+                </div>
+              </Card.Content>
+            </Card>
+          </List.Content>
+        </List.Item>
+      ));
 
-    var { isLoaded, items } = this.state;
-
-    if (!isLoaded) {
-      return <dir>Loading....</dir>;
-    }
-
-    else {
       return (
-        <div className="App">
-          Data has be loaded
-      </div>
+        <div>
+          <List celled>{data}</List>
+        </div>
       );
     }
   }
 }
-  export default App;
+export default App;
