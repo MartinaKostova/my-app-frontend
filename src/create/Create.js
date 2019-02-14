@@ -21,9 +21,9 @@ class Create extends Component {
       <Form>
         <Form.Select
           fluid
-          label="Gender"
+          label="Colour"
           options={options}
-          placeholder="Gender"
+          placeholder="Colour"
           value={colour}
           onChange={(event, data) => this.setState({ colour: data.value })}
         />
